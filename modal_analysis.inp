@@ -1,0 +1,136 @@
+! ==============================================================================
+! ANSYS MECHANICAL APDL INPUT SCRIPT: 2-DOF MODAL ANALYSIS
+! ==============================================================================
+! Project Title: Mechanical Vibration Analysis Using MATLAB & ANSYS
+! Institution:   National Institute of Technology (NIT) Hamirpur
+! Department:    Department of Mechanical Engineering
+! Academic Term: August 2025 - December 2025
+! Model Type:    2-Degree-of-Freedom Lumped Parameter Structural System
+! Elements:      MASS21 (Structural Mass), COMBIN14 (Spring-Damper)
+! Solver:        Block Lanczos Eigenvalue Extraction (LANB)
+! ==============================================================================
+
+/CLEAR, NOSTART
+/TITLE, NIT Hamirpur - 2-DOF Modal Analysis (MATLAB-ANSYS Benchmark)
+/FILENAME, modal_2dof, 1
+
+/PREP7
+! ------------------------------------------------------------------------------
+! 1. Element Type Definitions
+! ------------------------------------------------------------------------------
+! Element Type 1: MASS21 (Lumped Mass Element)
+ET, 1, MASS21
+KEYOPT, 1, 3, 2       ! 2D structural mass without rotary inertia (UX, UY DOFs)
+
+! Element Type 2: COMBIN14 (Spring-Damper Element)
+ET, 2, COMBIN14
+KEYOPT, 2, 2, 1       ! 1D longitudinal spring-damper along 1D DOF axis (UX)
+
+! ------------------------------------------------------------------------------
+! 2. Real Constant Definitions
+! ------------------------------------------------------------------------------
+! Real Constant Set 1: Mass of Floor 1 (m1 = 10.0 kg)
+R, 1, 10.0, 10.0      ! Mass UX = 10.0 kg, Mass UY = 10.0 kg
+
+! Real Constant Set 2: Mass of Floor 2 (m2 = 8.0 kg)
+R, 2, 8.0, 8.0        ! Mass UX = 8.0 kg, Mass UY = 8.0 kg
+
+! Real Constant Set 3: Story 1 Spring & Damper (k1 = 20,000 N/m, c1 = 25 N*s/m)
+R, 3, 20000.0, 25.0
+
+! Real Constant Set 4: Story 2 Spring & Damper (k2 = 12,000 N/m, c2 = 15 N*s/m)
+R, 4, 12000.0, 15.0
+
+! ------------------------------------------------------------------------------
+! 3. Geometry & Node Generation
+! ------------------------------------------------------------------------------
+N, 1, 0.0, 0.0, 0.0   ! Node 1: Fixed Ground Base
+N, 2, 1.0, 0.0, 0.0   ! Node 2: Floor 1 (m1 = 10 kg)
+N, 3, 2.0, 0.0, 0.0   ! Node 3: Floor 2 (m2 = 8 kg)
+
+! ------------------------------------------------------------------------------
+! 4. Element Connectivity
+! ------------------------------------------------------------------------------
+! Spring-Damper 1: Connects Node 1 (Ground) to Node 2 (Floor 1)
+TYPE, 2
+REAL, 3
+E, 1, 2
+
+! Spring-Damper 2: Connects Node 2 (Floor 1) to Node 3 (Floor 2)
+TYPE, 2
+REAL, 4
+E, 2, 3
+
+! Lumped Mass 1 at Node 2
+TYPE, 1
+REAL, 1
+E, 2
+
+! Lumped Mass 2 at Node 3
+TYPE, 1
+REAL, 2
+E, 3
+
+! ------------------------------------------------------------------------------
+! 5. Boundary Conditions & Degree of Freedom Constraints
+! ------------------------------------------------------------------------------
+! Constrain Node 1 completely (Fixed Ground Support)
+D, 1, ALL, 0.0
+
+! Constrain out-of-plane and vertical motion (Constrain UY, UZ, ROTX, ROTY, ROTZ)
+! This isolates the 1D horizontal dynamic degrees of freedom (UX)
+D, 2, UY, 0.0
+D, 2, UZ, 0.0
+D, 2, ROTX, 0.0
+D, 2, ROTY, 0.0
+D, 2, ROTZ, 0.0
+
+D, 3, UY, 0.0
+D, 3, UZ, 0.0
+D, 3, ROTX, 0.0
+D, 3, ROTY, 0.0
+D, 3, ROTZ, 0.0
+
+FINISH
+
+! ------------------------------------------------------------------------------
+! 6. Solution Phase - Modal Analysis
+! ------------------------------------------------------------------------------
+/SOLU
+ANTYPE, MODAL         ! Perform Modal Eigenvalue Analysis
+MODOPT, LANB, 2       ! Block Lanczos solver, extract 2 modes
+EQSLV, SPARSE         ! Sparse direct solver
+MXPAND, 2, , , YES    ! Expand 2 mode shapes and calculate element results
+LUMPM, OFF            ! Standard consistent formulation
+SOLVE
+FINISH
+
+! ------------------------------------------------------------------------------
+! 7. Post-Processing & Results Extraction
+! ------------------------------------------------------------------------------
+/POST1
+SET, LIST             ! List extracted natural frequencies
+
+! Query Mode 1
+SET, 1, 1
+*GET, FREQ_M1, ACTIVE, 0, SET, FREQ
+*GET, UX_N2_M1, NODE, 2, U, X
+*GET, UX_N3_M1, NODE, 3, U, X
+
+! Query Mode 2
+SET, 1, 2
+*GET, FREQ_M2, ACTIVE, 0, SET, FREQ
+*GET, UX_N2_M2, NODE, 2, U, X
+*GET, UX_N3_M2, NODE, 3, U, X
+
+! Output summary to text log
+/OUTPUT, ansys_modal_results, txt
+*MSG, INFO, FREQ_M1, UX_N2_M1, UX_N3_M1
+MODE 1 FREQ: %G Hz, Floor 1 UX: %G, Floor 2 UX: %G
+*MSG, INFO, FREQ_M2, UX_N2_M2, UX_N3_M2
+MODE 2 FREQ: %G Hz, Floor 1 UX: %G, Floor 2 UX: %G
+/OUTPUT
+FINISH
+! ==============================================================================
+! END OF MODAL APDL SCRIPT
+! ==============================================================================

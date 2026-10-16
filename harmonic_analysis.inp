@@ -1,0 +1,92 @@
+! ==============================================================================
+! ANSYS MECHANICAL APDL INPUT SCRIPT: 2-DOF HARMONIC RESPONSE ANALYSIS
+! ==============================================================================
+! Project Title: Mechanical Vibration Analysis Using MATLAB & ANSYS
+! Institution:   National Institute of Technology (NIT) Hamirpur
+! Department:    Department of Mechanical Engineering
+! Model Type:    2-Degree-of-Freedom Lumped Parameter Structural System
+! Analysis Type: Harmonic Response Analysis (Full Method / Sweep)
+! Excitation:    Harmonic Force F2(t) = 50 N at Node 3 (Top Floor)
+! Frequency:     0.5 Hz to 20.0 Hz (500 Substeps)
+! ==============================================================================
+
+/CLEAR, NOSTART
+/TITLE, NIT Hamirpur - 2-DOF Harmonic Response Sweep (0.5 to 20 Hz)
+/FILENAME, harmonic_2dof, 1
+
+/PREP7
+! 1. Element Types & Real Constants
+ET, 1, MASS21
+KEYOPT, 1, 3, 2
+ET, 2, COMBIN14
+KEYOPT, 2, 2, 1
+
+R, 1, 10.0, 10.0
+R, 2, 8.0, 8.0
+R, 3, 20000.0, 25.0
+R, 4, 12000.0, 15.0
+
+! 2. Nodes & Elements
+N, 1, 0.0, 0.0, 0.0
+N, 2, 1.0, 0.0, 0.0
+N, 3, 2.0, 0.0, 0.0
+
+TYPE, 2 $ REAL, 3 $ E, 1, 2
+TYPE, 2 $ REAL, 4 $ E, 2, 3
+TYPE, 1 $ REAL, 1 $ E, 2
+TYPE, 1 $ REAL, 2 $ E, 3
+
+! 3. Boundary Conditions
+D, 1, ALL, 0.0
+D, 2, UY, 0.0 $ D, 2, UZ, 0.0 $ D, 2, ROTX, 0.0 $ D, 2, ROTY, 0.0 $ D, 2, ROTZ, 0.0
+D, 3, UY, 0.0 $ D, 3, UZ, 0.0 $ D, 3, ROTX, 0.0 $ D, 3, ROTY, 0.0 $ D, 3, ROTZ, 0.0
+FINISH
+
+! ------------------------------------------------------------------------------
+! 4. Harmonic Solution Setup
+! ------------------------------------------------------------------------------
+/SOLU
+ANTYPE, HARMIC        ! Harmonic Response Analysis
+HROPT, FULL           ! Full Harmonic Method
+HROUT, OFF            ! Store only cluster/substep solution
+
+! Damping Definition
+! Rayleigh damping beta = 0.00125 s (stiffness proportional damping)
+BETAD, 0.00125
+
+! Harmonic Excitation: 50 N amplitude applied at Node 3 in UX direction
+F, 3, FX, 50.0
+
+! Frequency Range & Stepping
+HARFRQ, 0.5, 20.0     ! Swept from 0.5 Hz to 20.0 Hz
+NSUBST, 500           ! 500 evaluation substeps
+KBC, 1                ! Stepped boundary conditions
+SOLVE
+FINISH
+
+! ------------------------------------------------------------------------------
+! 5. Time-History Post-Processing (/POST26)
+! ------------------------------------------------------------------------------
+/POST26
+NUMVAR, 10
+
+! Variable 2: Floor 1 UX Displacement (Node 2)
+NSOL, 2, 2, U, X, DISP_NODE2
+
+! Variable 3: Floor 2 UX Displacement (Node 3)
+NSOL, 3, 3, U, X, DISP_NODE3
+
+! Plot Amplitude (PLCPLX: 0 = Amplitude, 1 = Phase Angle, 2 = Real, 3 = Imag)
+PLCPLX, 0
+/XRANGE, 0.5, 20.0
+/YRANGE, 0.0, 0.12
+PLVAR, 2, 3
+
+! Export numerical table to text file
+/OUTPUT, ansys_harmonic_frf_data, txt
+PRVAR, 2, 3
+/OUTPUT
+FINISH
+! ==============================================================================
+! END OF HARMONIC APDL SCRIPT
+! ==============================================================================

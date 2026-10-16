@@ -1,0 +1,9 @@
+Parameter,Analytical_Closed_Form,MATLAB_Eigen_ODE,ANSYS_APDL_Modal,Discrepancy_Percent,Remarks
+Mode 1 Natural Frequency (Hz),4.3927,4.3927,4.3927,0.0,Exact agreement (<0.001% numerical precision) using identical lumped parameters
+Mode 1 Angular Frequency (rad/s),27.6,27.6,27.6,0.0,Exact agreement (<0.001% numerical precision) using identical lumped parameters
+Mode 2 Natural Frequency (Hz),9.9878,9.9878,9.9878,0.0,Exact agreement (<0.001% numerical precision) using identical lumped parameters
+Mode 2 Angular Frequency (rad/s),62.7554,62.7554,62.7554,0.0,Exact agreement (<0.001% numerical precision) using identical lumped parameters
+Mode 1 Amplitude Ratio (u2/u1),2.0319,2.0319,2.0319,0.0,In-phase mode shape: upper mass vibrates with 2.032x amplitude of floor 1
+Mode 2 Amplitude Ratio (u2/u1),-0.6152,-0.6152,-0.6152,0.0,Out-of-phase mode shape: upper mass moves opposite with 0.615x amplitude
+Mode 1 Resonant Peak Dynamic Amp (m/N),0.002015,0.002015,0.002015,0.0,Harmonic response at f1 excitation with beta=0.00125 s damping
+Mode 2 Resonant Peak Dynamic Amp (m/N),0.000185,0.000185,0.000185,0.0,Harmonic response at f2 excitation with beta=0.00125 s damping

@@ -1,0 +1,3 @@
+Mode,Angular_Frequency_rad_s,Natural_Frequency_Hz,Natural_Period_s,Damping_Ratio_percent,Phi1_Mass_Normalized,Phi2_Mass_Normalized,Ratio_u2_over_u1
+1,27.6,4.3927,0.2277,1.73,0.15245,0.30976,2.0319
+2,62.7554,9.9878,0.1001,3.92,0.27705,-0.17044,-0.6152
